@@ -8,22 +8,22 @@ existing nginx. No container, port or background process is added.
 | Item | Path |
 |---|---|
 | Site files | `/var/www/ops-reporting-demo/` |
-| nginx site | `/etc/nginx/sites-available/ops-reporting-demo.epicrallytennis.com` + symlink in `sites-enabled/` |
-| TLS certificate | certbot certificate `ops-reporting-demo.epicrallytennis.com` |
+| nginx site | `/etc/nginx/sites-available/ops-reporting.nkemtasoft.com` + symlink in `sites-enabled/` |
+| TLS certificate | certbot certificate `ops-reporting.nkemtasoft.com` |
 | Logs | `/var/log/nginx/ops-reporting-demo.*.log` |
-| DNS | Cloudflare `A` record `ops-reporting-demo` → server (proxied) |
+| DNS | Cloudflare `A` record `ops-reporting` on nkemtasoft.com → server (proxied) |
 
 ## First-time setup
 
 ```bash
-scp deploy/nginx.conf root@SERVER:/etc/nginx/sites-available/ops-reporting-demo.epicrallytennis.com
+scp deploy/nginx.conf root@SERVER:/etc/nginx/sites-available/ops-reporting.nkemtasoft.com
 ssh root@SERVER '
   mkdir -p /var/www/ops-reporting-demo &&
-  ln -s /etc/nginx/sites-available/ops-reporting-demo.epicrallytennis.com /etc/nginx/sites-enabled/ &&
+  ln -s /etc/nginx/sites-available/ops-reporting.nkemtasoft.com /etc/nginx/sites-enabled/ &&
   nginx -t && systemctl reload nginx'
 ./deploy/deploy.sh
 # once DNS resolves:
-ssh root@SERVER 'certbot --nginx -d ops-reporting-demo.epicrallytennis.com --redirect'
+ssh root@SERVER 'certbot --nginx -d ops-reporting.nkemtasoft.com --redirect'
 ```
 
 ## Updating
@@ -36,11 +36,11 @@ ssh root@SERVER 'certbot --nginx -d ops-reporting-demo.epicrallytennis.com --red
 
 ```bash
 ssh root@SERVER '
-  certbot delete --cert-name ops-reporting-demo.epicrallytennis.com --non-interactive
-  rm /etc/nginx/sites-enabled/ops-reporting-demo.epicrallytennis.com
-  rm /etc/nginx/sites-available/ops-reporting-demo.epicrallytennis.com
+  certbot delete --cert-name ops-reporting.nkemtasoft.com --non-interactive
+  rm /etc/nginx/sites-enabled/ops-reporting.nkemtasoft.com
+  rm /etc/nginx/sites-available/ops-reporting.nkemtasoft.com
   nginx -t && systemctl reload nginx
   rm -rf /var/www/ops-reporting-demo /var/log/nginx/ops-reporting-demo.*'
 ```
 
-Then delete the `ops-reporting-demo` DNS record in Cloudflare.
+Then delete the `ops-reporting` DNS record in Cloudflare.
